@@ -122,7 +122,7 @@ void check_shader_error(GLuint shader, std::string extra_message) {
 }
 
 
-void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertices, int size,Flag_ flag)
+void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertices,std::string cvshaderf, std::string cfshaderf, Eigen::Vector3d* control_vertices, int size, int control_size, Flag_ flag)
 {
     GLFWwindow *window = init_window();
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -138,36 +138,78 @@ void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertic
 //    };
 
 
-    float* opengl_vertice = new float[size*3*2] ;
-    for(int i = 1 ; i < size ;i++)
-    {
-        opengl_vertice[2*i*3+0] = vertices[i-1][0] ;
-        opengl_vertice[2*i*3+1] = vertices[i-1][1] ;
-        opengl_vertice[2*i*3+2] = vertices[i-1][2] ;
+    float* opengl_vertice= nullptr ;
 
-        opengl_vertice[2*i*3+3] = vertices[i][0] ;
-        opengl_vertice[2*i*3+4] = vertices[i][1] ;
-        opengl_vertice[2*i*3+5] = vertices[i][2] ;
+    if(flag == FLAG_LINE)
+    {
+        opengl_vertice = new float[size*3*2] ;
+        for(int i = 1 ; i < size ;i++)
+        {
+            opengl_vertice[6*i+0] = vertices[i-1][0] ;
+            opengl_vertice[6*i+1] = vertices[i-1][1] ;
+            opengl_vertice[6*i+2] = vertices[i-1][2] ;
+
+            opengl_vertice[6*i+3] = vertices[i][0] ;
+            opengl_vertice[6*i+4] = vertices[i][1] ;
+            opengl_vertice[6*i+5] = vertices[i][2] ;
+//        std::cout<<" line from"<<vertices[i-1]<<" to "<<vertices[i]<<std::endl ;
+        }
+    }else{
+        opengl_vertice = new float[size*3] ;
+        for(int i = 0 ; i < size; i++)
+        {
+            opengl_vertice[3*i+0] = vertices[i][0] ;
+            opengl_vertice[3*i+1] = vertices[i][1] ;
+            opengl_vertice[3*i+2] = vertices[i][2] ;
+
+            std::cout<<vertices[i][0]<<" "<<vertices[i][1]<<" "<<vertices[i][2]<<std::endl ;
+        }
     }
 
+
+    float* control_points = new float[control_size*3] ;
+    for(int i = 0 ; i < control_size ;i++)
+    {
+        control_points[i*3+0] = control_vertices[i][0] ;
+        control_points[i*3+1] = control_vertices[i][1] ;
+        control_points[i*3+2] = control_vertices[i][2] ;
+    }
+
+
+
     // Set up buffers
-    GLuint VBO, VAO;
+    GLuint VBO, VBO1, VAO,VAO1;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER,size * 3 * 2 * sizeof(GLfloat), opengl_vertice, GL_STATIC_DRAW);
+
+
+    if(flag == FLAG_LINE)
+        glBufferData(GL_ARRAY_BUFFER,size * 3 * 2 * sizeof(GLfloat), opengl_vertice, GL_STATIC_DRAW);
+    else
+        glBufferData(GL_ARRAY_BUFFER,size * 3  * sizeof(GLfloat), opengl_vertice, GL_STATIC_DRAW);
+
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (GLvoid *)0);
+    glEnableVertexAttribArray(0);
+
+    glGenVertexArrays(1, &VAO1);
+    glBindVertexArray(VAO1);
+
+    glGenBuffers(1, &VBO1) ;
+    glBindBuffer(GL_ARRAY_BUFFER,VBO1) ;
+    glBufferData(GL_ARRAY_BUFFER, control_size*3*sizeof(GLfloat), control_points, GL_STATIC_DRAW) ;
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
 
-    glLineWidth(2.f);
+    glLineWidth(2.f) ;
+    glPointSize(3.f) ;
 
-
-//    Shader shader("C:\\Users\\lidan\\CLionProjects\\BezierAndBspline\\glsl\\render.vs",
-//                  "C:\\Users\\lidan\\CLionProjects\\BezierAndBspline\\glsl\\render.fs") ;
-    Shader shader(vshaderf.c_str(),fshaderf.c_str()) ;
+    Shader Lineshader(vshaderf.c_str(),fshaderf.c_str()) ;
+    Shader PointShader(cvshaderf.c_str(), cfshaderf.c_str()) ;
 
     ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
     bool show_demo_window = true;
@@ -179,26 +221,30 @@ void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertic
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(VAO);
-        shader.use() ;
-
+        Lineshader.use() ;
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
-
-        // world transformation
         glm::mat4 model = glm::mat4(1.0f);
-        shader.setMat4("model", model);
 
-        glBindVertexArray(VAO);
+        Lineshader.setMat4("projection", projection);
+        Lineshader.setMat4("view", view);
+        Lineshader.setMat4("model", model);
 
         switch (flag) {
             case FLAG_LINE:
-                glDrawArrays(GL_LINES, 0, size);
+                glDrawArrays(GL_LINES, 0, size*2);
             case FLAG_TRIANGLE:
                 glDrawArrays(GL_TRIANGLES,0,size);
 
         }
+
+        glBindVertexArray(VAO1) ;
+        PointShader.use() ;
+        PointShader.setMat4("projection", projection);
+        PointShader.setMat4("view", view);
+        PointShader.setMat4("model", model);
+
+        glDrawArrays(GL_POINTS,0,control_size) ;
 
         glBindVertexArray(0);
 
@@ -260,6 +306,9 @@ void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertic
 
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
+
+    glDeleteBuffers(1, &VBO1);
+    glDeleteVertexArrays(1, &VAO1);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
