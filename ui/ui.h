@@ -204,7 +204,7 @@ void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertic
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
-
+    glfwSetCursorPosCallback(window,mouse_callback) ;
     glLineWidth(2.f) ;
     glPointSize(3.f) ;
 

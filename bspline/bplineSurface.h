@@ -42,6 +42,8 @@ public:
 
     std::vector<Vector3d> getTriangles() ;
     std::vector<Vector3d> getLines() ;
+
+    void showCalculatePoints() ;
 };
 
 

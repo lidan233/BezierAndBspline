@@ -108,6 +108,8 @@ int main() {
     std::vector<Vector3d> tris = bsplinesurface.getTriangles() ;
     std::vector<Vector3d> lines = bsplinesurface.getLines() ;
 
+    bsplinesurface.showCalculatePoints() ;
+
 ////    for(int i = 0 ; i < res1.size(); i++)
 ////    {
 ////        std::cout<<res1[i].transpose()<<std::endl;

@@ -35,7 +35,7 @@ add_executable(BezierAndBspline main.cpp
         ${glfwsrc}
         ${gladsrc}
         ${imguidir}
-        bspline/bplineSurface.cpp bspline/bplineSurface.h ui/ui.h)
+        bspline/bplineSurface.cpp bspline/bplineSurface.h ui/ui.h function/FitGeometry.cpp function/FitGeometry.h util/Geometry.cpp util/Geometry.h util/Patch.cpp util/Patch.h)
 
 
 target_link_libraries(BezierAndBspline imgui glfw3)

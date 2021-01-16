@@ -267,19 +267,37 @@ std::vector<Vector3d> bSplineSurface::getLines()
         {
             lines.push_back(( _points[i][j] )) ;
             lines.push_back(( _points[i+1][j] )) ;
-            lines.push_back(( _points[i+1][j] )) ;
-            lines.push_back(( _points[i][j+1] )) ;
-            lines.push_back(( _points[i][j+1] )) ;
+//            lines.push_back(( _points[i+1][j] )) ;
+//            lines.push_back(( _points[i][j+1] )) ;
+            lines.push_back(( _points[i+1][j+1] )) ;
             lines.push_back(( _points[i][j] )) ;
 
-            lines.push_back((_points[i+1][j])) ;
             lines.push_back((_points[i][j+1])) ;
-            lines.push_back((_points[i][j+1])) ;
+//            lines.push_back((_points[i][j+1])) ;
+//            lines.push_back((_points[i][j+1])) ;
+//            lines.push_back((_points[i+1][j+1])) ;
             lines.push_back((_points[i+1][j+1])) ;
-            lines.push_back((_points[i+1][j+1])) ;
-            lines.push_back((_points[i+1][j])) ;
+//            lines.push_back((_points[i][j+1])) ;
+        }
+
+        for(int j = PrecisionSize_Y-1 ; j >= 0 ;j--)
+        {
+            lines.push_back((_points[i][j])) ;
         }
     }
 
     return lines ;
+}
+
+void bSplineSurface::showCalculatePoints()
+{
+    for(int i = 0 ; i < PrecisionSize_X ; i++)
+    {
+        for(int j = 0 ; j < PrecisionSize_Y; j++)
+        {
+            Vector3d t = _points[i][j] ;
+            std::cout<<t<<" shit" ;
+        }
+        std::cout<<std::endl ;
+    }
 }
