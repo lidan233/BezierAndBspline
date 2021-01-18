@@ -89,7 +89,7 @@ void Bspline::auto_produce_knots()
         }
     }else if(knots.size()==_controlpoints.size())
     {
-        std::vector<float> t = knots ;
+//        std::vector<float> t = knots ;
         knots.clear() ;
         for (int i=0; i<degree; i++) {
             knots.push_back(0.f);
@@ -118,7 +118,7 @@ void Bspline::auto_produce_knots()
     }
 }
 
-double Bspline::calculate_B_Function(int K_begin, int degree, float t )
+ double Bspline::calculate_B_Function(std::vector<float>& knots, int K_begin, int degree, float t )
 {
     if (degree == 0) {
         if ( t >= knots[K_begin] && t < knots[K_begin+1] )
@@ -143,12 +143,12 @@ double Bspline::calculate_B_Function(int K_begin, int degree, float t )
         }
 
         if(first == 0.0f)
-            return second * calculate_B_Function(K_begin+1, degree-1 , t) ;
+            return second * calculate_B_Function(knots,K_begin+1, degree-1 , t) ;
         else if(second ==0.0f)
-            return first*calculate_B_Function(K_begin,degree-1,t) ;
+            return first*calculate_B_Function(knots,K_begin,degree-1,t) ;
         else
-            return first*calculate_B_Function(K_begin,degree-1,t) +
-                second * calculate_B_Function(K_begin+1, degree-1 , t) ;
+            return first*calculate_B_Function(knots,K_begin,degree-1,t) +
+                second * calculate_B_Function(knots,K_begin+1, degree-1 , t) ;
     }
 }
 
@@ -227,9 +227,9 @@ Vector3d Bspline::calculate_one_cox_deboor(float t)
     Vector3d res(0.f,0,0);
     for (size_t i=0; i<_controlpoints.size(); ++i)
     {
-        double t1 = calculate_B_Function(i, degree, t) ;
+        double t1 = calculate_B_Function(knots, i, degree, t) ;
         std::cout<<t1<<" " ;
-        res += calculate_B_Function(i, degree, t)*_controlpoints.at(i);
+        res += calculate_B_Function(knots, i, degree, t)*_controlpoints.at(i);
     }
     std::cout<<std::endl ;
 //    res[2] = -1 ;

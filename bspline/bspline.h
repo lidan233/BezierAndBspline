@@ -23,15 +23,17 @@ private:
     void  getCubicPoint(float t,int order, Vector3d& res) ;
     Vector3d calculate_One_deboor(float t) ;
     Vector3d calculate_one_cox_deboor(float t) ;
-    double calculate_B_Function(int K_begin, int degree, float t ) ;
     void auto_produce_knots() ;
+
 
 public:
     Bspline(Vector3d* points, std::vector<float> &ks, int degree, int csize) ;
     void setPrecisions(int precisions) ;
     std::vector<Vector3d>& calCubicCurve() ;
+    static double calculate_B_Function(std::vector<float>& knots, int K_begin, int degree, float t ) ;
     std::vector<Vector3d>& calCurve_By_deboor() ;
     std::vector<Vector3d>& calCurve_By_Cox_deboor() ;
+
 
 
 };
