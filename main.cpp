@@ -189,7 +189,7 @@ int main() {
     XYKnots.push_back(s_knots) ;
     XYKnots.push_back(s_knots) ;
 
-    InterpolationSurface ss = InterpolationSurface(2,XYKnots,results11,300,300) ;
+    InterpolationSurface ss = InterpolationSurface(2,XYKnots,results11,500,500) ;
     std::vector<Vector3d> cc = ss.getPoints() ;
 
 //    for(int i  = 0 ; i < results11.size(); i++)
