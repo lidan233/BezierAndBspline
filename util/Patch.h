@@ -10,8 +10,9 @@
 
 using namespace Eigen ;
 
-class Patch {
-    Patch(int degree, std::vector<std::vector<Vector3d>> cpoints ) ;
+class Patch { ;
+public:
+    Patch(int degree, std::vector<std::vector<Vector3d>> cpoints ) {}
 };
 
 

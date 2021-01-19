@@ -13,6 +13,7 @@ ADD_SUBSRC(bezierdir bezier)
 ADD_SUBSRC(bsplinedir bspline)
 ADD_SUBSRC(utildir util)
 ADD_SUBSRC(imguidir external/imgui/imgui)
+ADD_SUBSRC(functiondir function)
 
 
 Lidan_ADD_LIB(PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/" INCLUDEDIRS includedir MSVC "TRUE" SOURCEDIR glfwsrc COMPONENTS "glfw3")
@@ -22,6 +23,7 @@ Lidan_ADD_SRC(PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/" SOURCEDIR gladsr
 include_directories(util
                     bezier
                     bspline
+                    function
                     external/glm/
                     external/eigen/
                     external/imgui/
@@ -34,8 +36,9 @@ add_executable(BezierAndBspline main.cpp
         ${bsplinedir}
         ${glfwsrc}
         ${gladsrc}
+        ${functiondir}
         ${imguidir}
-        bspline/bplineSurface.cpp bspline/bplineSurface.h ui/ui.h function/FitGeometry.cpp function/FitGeometry.h util/Geometry.cpp util/Geometry.h util/Patch.cpp util/Patch.h)
+        )
 
 
 target_link_libraries(BezierAndBspline imgui glfw3)

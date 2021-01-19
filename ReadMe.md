@@ -1,0 +1,3 @@
+# calculateBezierandBspline 
+
+## result 

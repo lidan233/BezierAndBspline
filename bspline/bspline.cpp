@@ -11,7 +11,7 @@ Bspline::Bspline(Vector3d* points, std::vector<float> &ks, int degree, int csize
         _controlpoints.push_back(Vector3d(points[i][0],points[i][1],points[i][2])) ;
     }
 
-    for(int k : ks)  knots.push_back(k) ;
+    for(float k : ks)  knots.push_back(k) ;
     auto_produce_knots() ;
     assert(knots.size() == degree+1+csize) ;
     for(int i = 0 ; i < knots.size(); i++) std::cout<<knots[i]<<" " ;
@@ -178,7 +178,7 @@ std::vector<Vector3d>& Bspline::calCurve_By_Cox_deboor()
 
 Vector3d Bspline::calculate_One_deboor(float t)
 {
-    std::cout<<" for "<<t <<" " ;
+//    std::cout<<" for "<<t <<" " ;
     int csize = this->_controlpoints.size() ;
     int k_size = this->knots.size() ;
     int n_points = this->Precisions ;
@@ -205,7 +205,7 @@ Vector3d Bspline::calculate_One_deboor(float t)
         points.push_back(_controlpoints[i]) ;
     }
 
-    std::cout<<index<<" " ;
+//    std::cout<<index<<" " ;
 
     for(int i = 1 ; i <= degree+1 ; i++)
     {
@@ -217,7 +217,7 @@ Vector3d Bspline::calculate_One_deboor(float t)
         }
     }
 
-    std::cout<<points[index].transpose()<<std::endl ;
+//    std::cout<<points[index].transpose()<<std::endl ;
     return  points[index] ;
 }
 
@@ -229,7 +229,7 @@ Vector3d Bspline::calculate_one_cox_deboor(float t)
     {
         double t1 = calculate_B_Function(knots, i, degree, t) ;
         std::cout<<t1<<" " ;
-        res += calculate_B_Function(knots, i, degree, t)*_controlpoints.at(i);
+        res += t1*_controlpoints.at(i);
     }
     std::cout<<std::endl ;
 //    res[2] = -1 ;
