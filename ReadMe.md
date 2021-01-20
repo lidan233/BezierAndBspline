@@ -21,15 +21,19 @@ AMD 3800 cpu, rtx3090.
 > - 随着采样点的增多，即使是相同degree的bspline，较多采样点也会大大降低对应loss，这在低degree的时候效果尤为显著。 
 
 ## some interestring Result
-Bspline Approximation
+> - Bspline Approximation
 ![picture 1](images/66f8cc4e44c4f2c1414df1b08477e942b5dca30564d658d13b11fb4e10616892.png)
-Bspline Interpolation for 4 data points 
+
+>- Bspline Interpolation for 4 data points 
 ![picture 2](images/c524c612c786bc33745566b60254488cb3b10083c419d0363d99244bea1423de.png)  
-Bspline  with 4 control Points 
+
+>- Bspline  with 4 control Points 
 ![picture 3](images/5c6e4e9681e5a15deb7576a046a2ad651d15aefe066a216a50610f3a43971a28.png)  
-Bezier  with 4 control points
+
+>- Bezier  with 4 control points
 ![picture 8](images/943122734e11510223b50a199ce8af8d15a4123b13df9d132e07be3a6aeb3b08.png)  
-Bspline Surface with  16 Control Points 
+
+>- Bspline Surface with  16 Control Points 
 ![picture 5](images/c22176fecad0f72dc8745c5ce44c4e730b896373f1bab4a42132b17359fcb964.png)  
 
 
