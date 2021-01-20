@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Eigen/Dense>
+
 #include "ui/ui.h"
 #include "bezierCurve.h"
 #include "bspline.h"
@@ -170,20 +171,20 @@ void ApproximationBSplineCurve(bool isCox, std::vector<Vector3d>& dpoints, int d
             FLAG_LINE) ;
 }
 
-void InterpolationBsplineSurface(bool isCox, std::vector<std::vector<Vector3d>>& dpoints, int degreex, int degreey, int Precision)
+void InterpolationBsplineSurface(bool isCox, std::vector<std::vector<Vector3d>>& dpoints, int degreex, int degreey, int Precision,Sphere sp)
 {
     std::vector<std::vector<float>> XYKnots = generate_knots_for_interpolationSurface(degreex,dpoints.size(),degreey,dpoints[0].size()) ;
     InterpolationSurface ss = InterpolationSurface(isCox,degreex,XYKnots,dpoints,Precision,Precision) ;
     std::vector<Vector3d> cc = ss.getPoints() ;
 
-    for(int i  = 0 ; i < dpoints.size(); i++)
-    {
-        for(int j = 0 ; j < dpoints[0].size();j++)
-        {
-            cc.push_back(dpoints[i][j]) ;
+    std::cout<<degreex<<" this error is "<<sp.getError(cc)<<std::endl  ;
+
+//    return ;
+    for(int i  = 0 ; i < dpoints.size(); i++) {
+        for (int j = 0; j < dpoints[0].size(); j++) {
+            cc.push_back(dpoints[i][j]);
         }
     }
-
     display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
             "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
             &dpoints[0][0] ,
@@ -211,10 +212,10 @@ void testBezierCurve()
 void testBsplineCurve()
 {
     std::vector<Vector3d>  result1(4) ;
-    result1[0]<<-1.0,0.0,-1.0 ;
-    result1[1]<<-0.5,  0.5,-1.0 ;
-    result1[2]<<0.5, -0.5,-1.0 ;
-    result1[3]<<1.0,0.0,-1.0 ;
+    result1[0]<<-1.0,0.0 ,-1.0 ;
+    result1[1]<<-0.5,0.5 ,-1.0 ;
+    result1[2]<<0.5 ,-0.5,-1.0 ;
+    result1[3]<<1.  ,0.0 ,-1.0  ;
     generateBSplineCurve(true, result1,3, 1000) ;
 
 }
@@ -262,15 +263,22 @@ void testApproximationBSplineCurve()
 void testInterpolationBsplineSurface()
 {
     Sphere sphere =  Sphere(Vector3d(0,0,0),1.0);
-    std::vector<std::vector<Vector3d>> datapoints = sphere.getSurface(10,10) ;
-    InterpolationBsplineSurface(true, datapoints, 2,2,500) ;
+    std::vector<std::vector<Vector3d>> datapoints = sphere.getSurface(15,15) ;
 
+//    for(int i = 3; i <15; i++)
+//    {
+//        InterpolationBsplineSurface(true, datapoints, i,i,500,sphere) ;
+//    }
+    InterpolationBsplineSurface(true, datapoints, 3,3,500,sphere) ;
 }
 
 
 int main()
 {
+//    testBezierCurve() ;
+    testGenerateBsplineSurface();
+//    testBsplineCurve() ;
 //    testInterpolationBSplineCurve() ;
 //    testApproximationBSplineCurve() ;
-    testInterpolationBsplineSurface() ;
+//    testInterpolationBsplineSurface() ;
 }

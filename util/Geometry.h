@@ -76,12 +76,12 @@ public:
         return Patch(degree,res) ;
      }
 
-     double getError(std::vector<Vector3d> allPoints)
+     double getError(std::vector<Vector3d>& allPoints)
      {
         double res = 0.0 ;
         for(int i = 0 ; i < allPoints.size();i++)
         {
-            res += abs((allPoints[i] - center).norm()) ;
+            res += abs((allPoints[i] - center).norm()-radius) ;
         }
         return res ;
      }
