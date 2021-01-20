@@ -28,8 +28,10 @@ Bspline Interpolation for 4 data points
 Bspline  with 4 control Points 
 ![picture 3](images/5c6e4e9681e5a15deb7576a046a2ad651d15aefe066a216a50610f3a43971a28.png)  
 Bezier  with 4 control points
-![picture 5](images/c22176fecad0f72dc8745c5ce44c4e730b896373f1bab4a42132b17359fcb964.png)  
+![picture 6](images/842be025ba0ea9eb27c694e475e2c333c29ac037c3b77400848c66c8453fc340.png)  
 Bspline Surface with  16 Control Points 
+![picture 5](images/c22176fecad0f72dc8745c5ce44c4e730b896373f1bab4a42132b17359fcb964.png)  
+
 
 ## some highLight of this code 
 > - This is a very comprehensive framework about Bezier and Bspline. 

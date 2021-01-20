@@ -275,8 +275,8 @@ void testInterpolationBsplineSurface()
 
 int main()
 {
-//    testBezierCurve() ;
-    testGenerateBsplineSurface();
+    testBezierCurve() ;
+//    testGenerateBsplineSurface();
 //    testBsplineCurve() ;
 //    testInterpolationBSplineCurve() ;
 //    testApproximationBSplineCurve() ;
