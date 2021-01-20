@@ -296,8 +296,8 @@ void bSplineSurface::showCalculatePoints()
         for(int j = 0 ; j < PrecisionSize_Y; j++)
         {
             Vector3d t = _points[i][j] ;
-            std::cout<<t<<" shit" ;
+//            std::cout<<t<<" shit" ;
         }
-        std::cout<<std::endl ;
+//        std::cout<<std::endl ;
     }
 }

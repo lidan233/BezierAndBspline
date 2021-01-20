@@ -44,10 +44,10 @@ InterpolationCurve::InterpolationCurve(int degree, std::vector<float>& knots, st
 
 
 
-std::vector<Vector3d>& InterpolationCurve::getPoints(int Precisions)
+std::vector<Vector3d>& InterpolationCurve::getPoints(int Precisions, bool isCox)
 {
     bspline->setPrecisions(Precisions) ;
-    return bspline->calCurve_By_deboor() ;
+    if(isCox) return bspline->calCurve_By_Cox_deboor() ; else return bspline->calCurve_By_deboor() ;
 }
 
 
@@ -99,41 +99,41 @@ ApproximationCurve::ApproximationCurve(int degree, std::vector<float>& knots, st
         tt.row(i) = t_Q ;
     }
 
-    std::cout<<"begin N "<<std::endl ;
-    std::cout<<N<<std::endl ;
+//    std::cout<<"begin N "<<std::endl ;
+//    std::cout<<N<<std::endl ;
 
     N = N.transpose() * N ;
     N = N.inverse() ;
 
-    std::cout<<"end N"<<std::endl ;
-    std::cout<<N<<std::endl ;
+//    std::cout<<"end N"<<std::endl ;
+//    std::cout<<N<<std::endl ;
 
 
 
     Matrix<double,Dynamic,Dynamic> ttt = N * tt ;
 
     _controlPoints.push_back(points[0]) ;
-    std::cout<<"control points 0 "<<points[0].transpose()<<std::endl ;
+//    std::cout<<"control points 0 "<<points[0].transpose()<<std::endl ;
 
     for(int i =0 ; i< size-2 ; i++)
     {
         Vector3d tttt = ttt.row(i) ;
         _controlPoints.push_back(tttt) ;
-        std::cout<<"control points "<<i<<" "<< points[0].transpose()<<std::endl ;
+//        std::cout<<"control points "<<i<<" "<< points[0].transpose()<<std::endl ;
     }
     _controlPoints.push_back(points[points.size()-1]) ;
-    std::cout<<"control points "<<points.size()-1<<" "<< points[0].transpose()<<std::endl ;
+//    std::cout<<"control points "<<points.size()-1<<" "<< points[0].transpose()<<std::endl ;
 
     bspline = new Bspline(&_controlPoints[0],knots,degree,_controlPoints.size()) ;
 
 }
-std::vector<Vector3d>& ApproximationCurve::getPoints(int Precisions)
+std::vector<Vector3d>& ApproximationCurve::getPoints(int Precisions, bool isCox)
 {
     bspline->setPrecisions(Precisions) ;
-    return bspline->calCurve_By_deboor() ;
+    if(isCox) return bspline->calCurve_By_Cox_deboor() ; else return bspline->calCurve_By_deboor() ;
 }
 
-InterpolationSurface::InterpolationSurface(int degreeall, std::vector<std::vector<float>>& knots, std::vector<std::vector<Vector3d>>& points,int PrecisionX,int PrecisionY)
+InterpolationSurface::InterpolationSurface(bool isCox, int degreeall, std::vector<std::vector<float>>& knots, std::vector<std::vector<Vector3d>>& points,int PrecisionX,int PrecisionY)
 {
     this->degreeall = degreeall ;
     this->_points = points ;
@@ -150,7 +150,7 @@ InterpolationSurface::InterpolationSurface(int degreeall, std::vector<std::vecto
             pp.push_back(points[j][i]) ;
         }
         InterpolationCurve a  = InterpolationCurve(degreeall,kk,pp) ;
-        std::vector<Vector3d>& ttt = a.getPoints(PrecisionX) ;
+        std::vector<Vector3d>& ttt = a.getPoints(PrecisionX,isCox) ;
         newpoints.push_back( ttt ) ;
     }
 
@@ -163,7 +163,7 @@ InterpolationSurface::InterpolationSurface(int degreeall, std::vector<std::vecto
             pp.push_back(newpoints[j][i]) ;
         }
         InterpolationCurve a = InterpolationCurve(degreeall,kk1,pp) ;
-        std::vector<Vector3d>& ttt = a.getPoints(PrecisionY) ;
+        std::vector<Vector3d>& ttt = a.getPoints(PrecisionY,isCox) ;
         _controlPoints.push_back( ttt ) ;
     }
 }

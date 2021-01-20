@@ -4,18 +4,20 @@
 
 #include "bezierCurve.h"
 #include "MyMath.h"
-#define ALGORITHM 0
+#include "assert.h"
 
 
-Vector3d* bezierCurve::calCurve() {
+
+Vector3d* bezierCurve::calCurve(bool isdeCalsteljau) {
+
     std::cout<< "New Line"<<std::endl ;
-    for(int i = 0 ;i < numPoints;i++)
-    {
-        std::cout<<controlPoints[i][0]<<","<<controlPoints[i][1]<<","<<controlPoints[i][2]<<std::endl ;
-    }
+//    for(int i = 0 ;i < numPoints;i++)
+//    {
+//        std::cout<<controlPoints[i][0]<<","<<controlPoints[i][1]<<","<<controlPoints[i][2]<<std::endl ;
+//    }
 
     curvePoints = new Vector3d[precision+1] ;
-    if(ALGORITHM == 0)
+    if(isdeCalsteljau)
     {
         for(int i = 0 ;i <= precision ;i++)
         {
@@ -30,7 +32,6 @@ Vector3d* bezierCurve::calCurve() {
 
             for (int m = 0; m <= numPoints; m++) {
                 float bm = bernstein(m, numPoints, u);
-
                 (*point)[0] += bm * controlPoints[m][0];
                 (*point)[1] += bm * controlPoints[m][1];
                 (*point)[2] += bm * controlPoints[m][2];

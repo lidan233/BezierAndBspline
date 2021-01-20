@@ -22,7 +22,7 @@ private:
     Bspline* bspline ;
 public:
     InterpolationCurve(int degree, std::vector<float>& knots, std::vector<Vector3d>& points) ;
-    std::vector<Vector3d>& getPoints(int Precisions) ;
+    std::vector<Vector3d>& getPoints(int Precisions, bool isCox) ;
 };
 
 class ApproximationCurve{
@@ -34,7 +34,7 @@ private:
 
 public:
     ApproximationCurve(int degree, std::vector<float>& knots, std::vector<Vector3d>& points) ;
-    std::vector<Vector3d>& getPoints(int Precisions) ;
+    std::vector<Vector3d>& getPoints(int Precisions, bool isCox) ;
 };
 
 class InterpolationSurface{
@@ -45,7 +45,7 @@ private:
     int degreeall = 0 ;
 
 public:
-    InterpolationSurface(int degreeall, std::vector<std::vector<float>>& knots, std::vector<std::vector<Vector3d>>& points,int PrecisionX,int PrecisionY) ;
+    InterpolationSurface(bool isCox, int degreeall, std::vector<std::vector<float>>& knots, std::vector<std::vector<Vector3d>>& points,int PrecisionX,int PrecisionY) ;
 //    std::vector<Vector3d> getTriangles(bool isCox) ;
 //    std::vector<Vector3d> getLines(bool isCox) ;
     std::vector<Vector3d > getPoints() {

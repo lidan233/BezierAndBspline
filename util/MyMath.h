@@ -20,7 +20,7 @@ static inline int factorial(int n){
 
 // 返回一个伯恩斯坦基
 static inline float bernstein(int i, int n, float t){
-    float r = (float) factorial(n) / (float) (factorial(i) * factorial(n - i));
+    float r = (double) factorial(n) / (double) (factorial(i) * factorial(n - i));
     r *= pow(t,i);
     r *= pow(1-t,n-i);
     return r;

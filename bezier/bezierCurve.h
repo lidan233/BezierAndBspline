@@ -22,7 +22,7 @@ public:
     bezierCurve(Vector3d* controlPoints,int numPoints ) ;
     bool setshowPoints(int  showControlPoints ) ;
     virtual void draw();
-    Vector3d* calCurve() ;
+    Vector3d* calCurve(bool isdeCalsteljau) ;
     ~bezierCurve();
 };
 #endif //BEZIERANDBSPLINE_BEZIERCURVE_H

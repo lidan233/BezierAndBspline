@@ -10,207 +10,267 @@
 using namespace std;
 using namespace Eigen ;
 
+std::vector<float> generate_knots_for_interpolationCurve(int degree, int csize)
+{
 
-
-int main() {
-    Vector3d* result = new Vector3d[4] ;
-
-    result[0]<<-1.0,-1.0,-1.0 ;
-    result[1]<<-2.0,-3.0,-1.0 ;
-    result[2]<<-3.0,-0.8,-1.0 ;
-    result[3]<<-4.0,-1.0,-1.0 ;
-
-    bezierCurve bc(result,4) ;
-    bc.setPrecisions(100) ;
-    Vector3d* res = bc.calCurve() ;
-
-
-//    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
-//            res ,
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
-//            result,
-//            100,
-//            4,
-//            FLAG_LINE) ;
-
-
-
-
-    std::vector<Vector3d>  result1(4) ;
-    result1[0]<<-1.0,0.0,-1.0 ;
-    result1[1]<<-0.5,  0.5,-1.0 ;
-    result1[2]<<0.5, -0.5,-1.0 ;
-    result1[3]<<1.0,0.0,-1.0 ;
-
-
-//    result1[3]<<-4.0,-1.0,-1.0 ;
-
-
-    std::vector<float> knots ;
-//    knots.push_back(0) ;
-//    knots.push_back(1) ;
-//    knots.push_back(2) ;
-//    knots.push_back(3) ;
-//    knots.push_back(4) ;
-//    knots.push_back(5) ;
-//    knots.push_back(6) ;
-
-    knots.push_back(0) ;
-    knots.push_back(0) ;
-    knots.push_back(0) ;
-    knots.push_back(1) ;
-    knots.push_back(2) ;
-    knots.push_back(2) ;
-    knots.push_back(2) ;
-
-// calculate curve
-//    Bspline spline(&result1[0],knots,2,4) ;
-//    spline.setPrecisions(1000) ;
-//    std::vector<Vector3d>& res1 = spline.calCurve_By_Cox_deboor() ;
-
-//    std::vector<Vector3d>& res1 = spline.calCurve_By_deboor() ;
-
-//    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
-//            &res1[0] ,
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
-//            result1,
-//            res1.size(),
-//            4,
-//            FLAG_LINE) ;
-
-
-
-//    // calculate surface
-    Vector3d** results = new Vector3d*[4] ;
-    for(int i  = 0 ; i < 4; i++)
+    std::vector<float> res ;
+    for (int i=0; i<degree; i++) {
+        res.push_back(0.f);
+    }
+    float kstep = 1.0 / float(csize -degree) ;
+    for(int i = 0 ; i <= float(csize -degree); i++)
     {
-        results[i] = new Vector3d[4] ;
-        for(int j = 0 ; j < 4;j++)
+        res.push_back(i*kstep) ;
+    }
+    for (int i=0; i<degree ; ++i) {
+        res.push_back(1.f + 1e-6f);
+    }
+
+    return res ;
+}
+
+std::vector<float> generate_knots_for_Unifrom(int degree, int csize)
+{
+    std::vector<float> res ;
+    for(int i = 0 ; i < degree+csize+1; i++)
+    {
+        res.push_back(i) ;
+    }
+    return res ;
+}
+
+
+std::vector<std::vector<float>> generate_knots_for_interpolationSurface(int degreex, int csize_x, int degreey, int csize_y )
+{
+    std::vector<std::vector<float>> data ;
+    data.push_back(generate_knots_for_interpolationCurve(degreex,csize_x)) ;
+    data.push_back(generate_knots_for_interpolationCurve(degreey, csize_y)) ;
+    return data;
+}
+
+void generateBezierCurve(std::vector<Vector3d>& cpoints, int Precisions, bool isdeCalsteljau)
+{
+    bezierCurve bc(&cpoints[0],cpoints.size()) ;
+    bc.setPrecisions(Precisions) ;
+    Vector3d* res = bc.calCurve(isdeCalsteljau) ;
+    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
+            res ,
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
+            &cpoints[0],
+            Precisions,
+            cpoints.size(),
+            FLAG_LINE) ;
+}
+
+void generateBSplineCurve(bool isCox, std::vector<Vector3d>&cpoints,int degree, int Precision)
+{
+    std::vector<float> knots = generate_knots_for_interpolationCurve(degree,cpoints.size()) ;
+//    std::vector<float> knots = generate_knots_for_Unifrom(degree,cpoints.size()) ;
+
+    Bspline spline(&cpoints[0],knots,degree,cpoints.size()) ;
+    spline.setPrecisions(Precision) ;
+    std::vector<Vector3d>& res1 = isCox?spline.calCurve_By_Cox_deboor():spline.calCurve_By_deboor()  ;
+
+    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
+            &res1[0] ,
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
+            &cpoints[0],
+            res1.size(),
+            cpoints.size(),
+            FLAG_LINE) ;
+}
+
+void generateBSplineSurface(bool isCox, std::vector<std::vector<Vector3d>>& cpoints,int degree, int Precision)
+{
+    Vector3d** result = new Vector3d*[cpoints.size()] ;
+    std::vector<Vector3d> usingControl ;
+    for(int i = 0 ; i < cpoints.size() ;i++)
+    {
+        result[i] = new Vector3d[cpoints[i].size()] ;
+        for(int j = 0 ; j < cpoints[i].size();j++)
         {
-            results[i][j] = Vector3d(i,j,sqrt(32.0-i*i-j*j)) ;
+            result[i][j] = cpoints[i][j] ;
+            usingControl.push_back(cpoints[i][j]) ;
         }
     }
 
 
-//    bSplineSurface bsplinesurface(results,4,4,2) ;
-//    bsplinesurface.setPrecision(100,100) ;
-////    bsplinesurface.calSurface_By_Cox_deboor() ;
-//    bsplinesurface.calSurface_By_deboor() ;
-//    std::vector<Vector3d> tris = bsplinesurface.getTriangles() ;
-//    std::vector<Vector3d> lines = bsplinesurface.getLines() ;
-//
-//    bsplinesurface.showCalculatePoints() ;
 
-////    for(int i = 0 ; i < res1.size(); i++)
-////    {
-////        std::cout<<res1[i].transpose()<<std::endl;
-////    }
+    bSplineSurface bsplinesurface(result,cpoints.size(),cpoints[0].size(),degree) ;
+    bsplinesurface.setPrecision(Precision,Precision) ;
+    if(isCox)  bsplinesurface.calSurface_By_Cox_deboor(); else  bsplinesurface.calSurface_By_deboor() ;
+
+    std::vector<Vector3d> tris = bsplinesurface.getTriangles() ;
+    std::vector<Vector3d> lines = bsplinesurface.getLines() ;
+
+//    bsplinesurface.showCalculatePoints() ;
+//    for(int i = 0 ; i < res1.size(); i++)
+//    {
+//        std::cout<<res1[i].transpose()<<std::endl;
+//    }
+
+
 //    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
 //            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
 //            &tris[0] ,
 //            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
 //            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
-//            &result1[0],
+//            &usingControl[0],
 //            tris.size(),
-//            4,
+//            usingControl.size(),
 //            FLAG_TRIANGLE) ;
-//    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
-//            &lines[0] ,
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
-//            &result1[0],
-//            lines.size(),
-//            4,
-//            FLAG_LINE) ;
-
-    std::vector<float> _knots ;
-    for (int i=0; i<2; i++) {
-        _knots.push_back(0.f);
-    }
-    float kstep = 1.0 / (4.0 -2.0) ;
-    for(int i = 0 ; i <= 4.0-2.0; i++)
-    {
-        _knots.push_back(i*kstep) ;
-    }
-    for (int i=0; i<2; ++i) {
-        _knots.push_back(1.f + 1e-6f);
-    }
-
-
-//    InterpolationCurve interpolationCurve = InterpolationCurve(2,_knots,result1) ;
-//    std::vector<Vector3d>& res1 = interpolationCurve.getPoints(1000) ;
-
-//    ApproximationCurve approximationCurve = ApproximationCurve(2,_knots, result1) ;
-//    std::vector<Vector3d>& res2 = approximationCurve.getPoints(1000) ;
-//
-//    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
-//            &res2[0] ,
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
-//            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
-//            &result1[0],
-//            res2.size(),
-//            4,
-//            FLAG_LINE) ;
-
-
-//    std::vector<std::vector<Vector3d>> results11  ;
-//    for(int i  = 0 ; i < 4; i++)
-//    {
-//        results11.push_back(std::vector<Vector3d>()) ;
-//        for(int j = 0 ; j < 4;j++)
-//        {
-//            results11[i].push_back(Vector3d(i,j,sqrt(32.0-i*i-j*j))) ;
-//        }
-//    }
-    Sphere sphere =  Sphere(Vector3d(0,0,0),1.0);
-    std::vector<std::vector<Vector3d>> results11 = sphere.getSurface(10,10) ;
-
-    std::vector<float> s_knots ;
-    for (int i=0; i<2; i++) {
-        s_knots.push_back(0.f);
-    }
-    float skstep = 1.0 / (10.0-2.0) ;
-    for(int i = 0 ; i <= 10.0-2.0; i++)
-    {
-       s_knots.push_back(i*skstep) ;
-    }
-    for (int i=0; i<2; ++i) {
-        s_knots.push_back(1.f + 1e-6f);
-    }
-
-
-    std::vector<std::vector<float>> XYKnots;
-    XYKnots.push_back(s_knots) ;
-    XYKnots.push_back(s_knots) ;
-
-    InterpolationSurface ss = InterpolationSurface(2,XYKnots,results11,500,500) ;
-    std::vector<Vector3d> cc = ss.getPoints() ;
-
-//    for(int i  = 0 ; i < results11.size(); i++)
-//    {
-//        for(int j = 0 ; j < results11[0].size();j++)
-//        {
-//            cc.push_back(results11[i][j]) ;
-//        }
-//    }
-
-
 
     display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
             "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
-            &res[0] ,
+            &lines[0] ,
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
+            &usingControl[0],
+            lines.size(),
+            usingControl.size(),
+            FLAG_LINE) ;
+
+
+}
+
+
+void InterpolationBSplineCurve(bool isCox, std::vector<Vector3d> &dpoints, int degree) {
+    std::vector<float> knots = generate_knots_for_interpolationCurve(degree,dpoints.size()) ;
+    InterpolationCurve interpolationCurve = InterpolationCurve(degree,knots,dpoints) ;
+    std::vector<Vector3d>& res1 = interpolationCurve.getPoints(1000,isCox) ;
+    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
+            &res1[0] ,
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
+            &dpoints[0],
+            res1.size(),
+            dpoints.size(),
+            FLAG_LINE) ;
+}
+
+void ApproximationBSplineCurve(bool isCox, std::vector<Vector3d>& dpoints, int degree)
+{
+    std::vector<float> knots = generate_knots_for_interpolationCurve(degree,dpoints.size()) ;
+    ApproximationCurve approximationCurve = ApproximationCurve(2,knots, dpoints) ;
+    std::vector<Vector3d>& res2 = approximationCurve.getPoints(1000,isCox) ;
+
+    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
+            &res2[0] ,
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
+            &dpoints[0],
+            res2.size(),
+            dpoints.size(),
+            FLAG_LINE) ;
+}
+
+void InterpolationBsplineSurface(bool isCox, std::vector<std::vector<Vector3d>>& dpoints, int degreex, int degreey, int Precision)
+{
+    std::vector<std::vector<float>> XYKnots = generate_knots_for_interpolationSurface(degreex,dpoints.size(),degreey,dpoints[0].size()) ;
+    InterpolationSurface ss = InterpolationSurface(isCox,degreex,XYKnots,dpoints,Precision,Precision) ;
+    std::vector<Vector3d> cc = ss.getPoints() ;
+
+    for(int i  = 0 ; i < dpoints.size(); i++)
+    {
+        for(int j = 0 ; j < dpoints[0].size();j++)
+        {
+            cc.push_back(dpoints[i][j]) ;
+        }
+    }
+
+    display("C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.vs",
+            "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\render.fs",
+            &dpoints[0][0] ,
             "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.vs",
             "C:\\Users\\lidan\\Desktop\\BezierAndBspline-master\\glsl\\point.fs",
             &cc[0],
             0,
             cc.size(),
             FLAG_LINE) ;
+}
 
-    return 0;
+void testBezierCurve()
+{
+
+    std::vector<Vector3d> controlP ;
+
+    controlP.push_back(Vector3d(-1.0,-1.0,-1.0)) ;
+    controlP.push_back(Vector3d(-2.0,-3.0,-1.0 )) ;
+    controlP.push_back(Vector3d(-3.0,-0.8,-1.0)) ;
+    controlP.push_back(Vector3d(-4.0,-1.0,-1.0)) ;
+
+    generateBezierCurve(controlP,1000, true ) ;
+}
+
+void testBsplineCurve()
+{
+    std::vector<Vector3d>  result1(4) ;
+    result1[0]<<-1.0,0.0,-1.0 ;
+    result1[1]<<-0.5,  0.5,-1.0 ;
+    result1[2]<<0.5, -0.5,-1.0 ;
+    result1[3]<<1.0,0.0,-1.0 ;
+    generateBSplineCurve(true, result1,3, 1000) ;
+
+}
+
+
+void  testGenerateBsplineSurface()
+{
+    std::vector<std::vector<Vector3d>> results ;
+    for(int i  = 0 ; i < 4; i++)
+    {
+        std::vector<Vector3d> rr ;
+        for(int j = 0 ; j < 4;j++)
+        {
+            rr.push_back(Vector3d(i,j,sqrt(32.0-i*i-j*j)) ) ;
+        }
+        results.push_back(rr) ;
+    }
+    generateBSplineSurface(true, results, 2,100) ;
+}
+
+
+void testInterpolationBSplineCurve()
+{
+//    Sphere sphere =  Sphere(Vector3d(0,0,0),1.0);
+//    std::vector<std::vector<Vector3d>> datapoints = sphere.getSurface(10,10) ;
+    std::vector<Vector3d>  result1(4) ;
+    result1[0]<<-1.0,0.0,-1.0 ;
+    result1[1]<<-0.5,  0.5,-1.0 ;
+    result1[2]<<0.5, -0.5,-1.0 ;
+    result1[3]<<1.0,0.0,-1.0 ;
+    InterpolationBSplineCurve(true,result1,2) ;
+}
+
+
+void testApproximationBSplineCurve()
+{
+    std::vector<Vector3d>  result1(4) ;
+    result1[0]<<-1.0,0.0,-1.0 ;
+    result1[1]<<-0.5,  0.5,-1.0 ;
+    result1[2]<<0.5, -0.5,-1.0 ;
+    result1[3]<<1.0,0.0,-1.0 ;
+    ApproximationBSplineCurve(true, result1, 2) ;
+}
+
+void testInterpolationBsplineSurface()
+{
+    Sphere sphere =  Sphere(Vector3d(0,0,0),1.0);
+    std::vector<std::vector<Vector3d>> datapoints = sphere.getSurface(10,10) ;
+    InterpolationBsplineSurface(true, datapoints, 2,2,500) ;
+
+}
+
+
+int main()
+{
+//    testInterpolationBSplineCurve() ;
+//    testApproximationBSplineCurve() ;
+    testInterpolationBsplineSurface() ;
 }

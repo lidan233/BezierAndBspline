@@ -162,7 +162,7 @@ void display(std::string vshaderf, std::string fshaderf, Eigen::Vector3d* vertic
             opengl_vertice[3*i+1] = vertices[i][1] ;
             opengl_vertice[3*i+2] = vertices[i][2] ;
 
-            std::cout<<vertices[i][0]<<" "<<vertices[i][1]<<" "<<vertices[i][2]<<std::endl ;
+//            std::cout<<vertices[i][0]<<" "<<vertices[i][1]<<" "<<vertices[i][2]<<std::endl ;
         }
     }
 
